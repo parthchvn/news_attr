@@ -1,0 +1,67 @@
+name: Publish inspected-context pilot
+on:
+  workflow_dispatch:
+  push:
+    paths: ['.github/workflows/publish-seed.yml','context/seed_documents.jsonl']
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: inspected-context-publish
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -e '.[parquet,dev]'
+      - run: python -m pytest -q
+      - name: Recover original failed-search provenance
+        uses: actions/download-artifact@v4
+        with:
+          name: two-market-pilot
+          run-id: 34778661460
+          github-token: ${{ github.token }}
+          path: /tmp/original-pilot
+      - name: Build real prices, candidate attribution and D-C
+        run: python -m polymarket_context.seed --failed-search-status /tmp/original-pilot/search_status.jsonl
+      - name: Record generating commit
+        run: git rev-parse HEAD > outputs/two_markets/generating_commit.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: real-two-market-context
+          path: |
+            outputs/two_markets/*.json
+            outputs/two_markets/*.jsonl
+            outputs/two_markets/*.csv
+            outputs/two_markets/*.gz
+            outputs/two_markets/*.parquet
+            outputs/two_markets/*.html
+            outputs/two_markets/*.txt
+          retention-days: 30
+      - name: Commit completed results with fast-forward retries
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f outputs/two_markets/*.json outputs/two_markets/*.jsonl outputs/two_markets/*.csv outputs/two_markets/*.gz outputs/two_markets/*.parquet outputs/two_markets/*.html outputs/two_markets/*.txt
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish real two-market charts and explicitly unverified candidate context'
+            pushed=false
+            for attempt in 1 2 3; do
+              git pull --rebase origin main
+              if git push origin HEAD:main; then
+                pushed=true
+                break
+              fi
+              sleep 3
+            done
+            test "$pushed" = true
+          fi
+          cat outputs/two_markets/pilot_status.json >> "$GITHUB_STEP_SUMMARY"
