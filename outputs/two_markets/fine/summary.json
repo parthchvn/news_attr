@@ -1,0 +1,115 @@
+{
+  "detector_version": "fine-v2",
+  "configuration": {
+    "bin_seconds": 30,
+    "horizons_seconds": [
+      30,
+      60,
+      180,
+      300,
+      900
+    ],
+    "min_change_pp": 1.0,
+    "min_tail_change_pp": 0.2,
+    "min_log_odds_change": 0.35,
+    "min_variation_pp": 1.5,
+    "logit_clip": 0.001,
+    "min_transactions": 2,
+    "min_shares": 5.0,
+    "corroboration_pp": 0.5,
+    "min_coverage": 0.6,
+    "baseline_hours": 24,
+    "min_baseline_samples": 30,
+    "z_threshold": 4.0,
+    "pp_scale_floor": 0.15,
+    "logit_scale_floor": 0.05,
+    "news_merge_seconds": 120,
+    "news_max_span_seconds": 600
+  },
+  "normalization_audit": {
+    "input_rows": 119183,
+    "input_kind": "trades",
+    "warnings": [
+      "Notional and count are recorded-fill aggregates, not audited economic turnover."
+    ],
+    "invalid_rows_removed": 1,
+    "duplicate_logs_removed": 0,
+    "valid_rows": 119182
+  },
+  "participant_audit": {
+    "exchange_summary_rows_removed": 0,
+    "filter_rule": "maker/taker matches known v1/v2 exchange, observed contract value or zero address",
+    "human_bot_classification": "not_available"
+  },
+  "source_sha256": "abdc2afa224fd4be77ef3122bd30ae19d330ce68019e2707a195a7ef151e748e",
+  "source_path": "data/selected/trades.parquet",
+  "markets": {
+    "507300": {
+      "valid_fills": 86686,
+      "observed_bins": 39102,
+      "empty_bins_not_imputed": 698466,
+      "supported_bins": 15088,
+      "tested_horizon_windows": 36571,
+      "individual_alert_times": 104,
+      "unusual_alert_times": 64,
+      "supported_size_only_times": 40,
+      "news_groups": 23,
+      "legacy_episode_dots": 3,
+      "legacy_alert_bins": 17
+    },
+    "2446852": {
+      "valid_fills": 32496,
+      "observed_bins": 7975,
+      "empty_bins_not_imputed": 90271,
+      "supported_bins": 2157,
+      "tested_horizon_windows": 4576,
+      "individual_alert_times": 711,
+      "unusual_alert_times": 72,
+      "supported_size_only_times": 639,
+      "news_groups": 118,
+      "legacy_episode_dots": 7,
+      "legacy_alert_bins": 62
+    }
+  },
+  "review_windows": [
+    {
+      "market_id": "507300",
+      "label": "Final evening (31 May)",
+      "start": "2025-05-31T19:00:00Z",
+      "end": "2025-05-31T21:00:00Z",
+      "individual_alert_times": 82,
+      "unusual_alert_times": 64,
+      "short_horizon_alert_times": 58
+    },
+    {
+      "market_id": "507300",
+      "label": "30 April detail",
+      "start": "2025-04-30T19:00:00Z",
+      "end": "2025-04-30T21:30:00Z",
+      "individual_alert_times": 3,
+      "unusual_alert_times": 0,
+      "short_horizon_alert_times": 2
+    },
+    {
+      "market_id": "2446852",
+      "label": "6 July detail",
+      "start": "2026-07-06T18:30:00Z",
+      "end": "2026-07-06T23:30:00Z",
+      "individual_alert_times": 244,
+      "unusual_alert_times": 13,
+      "short_horizon_alert_times": 205
+    },
+    {
+      "market_id": "2446852",
+      "label": "7 July repricing",
+      "start": "2026-07-07T18:00:00Z",
+      "end": "2026-07-07T20:00:00Z",
+      "individual_alert_times": 132,
+      "unusual_alert_times": 55,
+      "short_horizon_alert_times": 47
+    }
+  ],
+  "news_queries_executed": 0,
+  "strict_dc_modified": false,
+  "interpretation": "Finer recorded-price diagnostics, not validated causal spikes, quotes or new news."
+}
