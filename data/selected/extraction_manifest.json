@@ -1,0 +1,32 @@
+{
+  "status": "complete",
+  "dataset": "SII-WANGZJ/Polymarket_data",
+  "revision": "6d3c336c39cf1a2dfe53d702ad2c110ab5bdbfde",
+  "market_ids": [
+    "507300",
+    "2446852"
+  ],
+  "source": "https://huggingface.co/datasets/SII-WANGZJ/Polymarket_data/resolve/6d3c336c39cf1a2dfe53d702ad2c110ab5bdbfde/trades.parquet",
+  "markets_source": "https://huggingface.co/datasets/SII-WANGZJ/Polymarket_data/resolve/6d3c336c39cf1a2dfe53d702ad2c110ab5bdbfde/markets.parquet",
+  "started_at": "2026-09-13T19:31:06.071434+00:00",
+  "screenshot_counts_are_unverified": true,
+  "market_metadata_verified": true,
+  "summary": [
+    {
+      "market_id": "2446852",
+      "raw_fills": 32496,
+      "raw_usd_amount": 46545142.01999832,
+      "first_timestamp": 1780697065,
+      "last_timestamp": 1783644416
+    },
+    {
+      "market_id": "507300",
+      "raw_fills": 86687,
+      "raw_usd_amount": 74704526.39001489,
+      "first_timestamp": 1726608502,
+      "last_timestamp": 1748735512
+    }
+  ],
+  "sha256_trades_parquet": "abdc2afa224fd4be77ef3122bd30ae19d330ce68019e2707a195a7ef151e748e",
+  "completed_at": "2026-09-13T19:42:48.936233+00:00"
+}
