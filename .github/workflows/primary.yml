@@ -1,0 +1,59 @@
+name: Release-first source capture
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'polymarket_context/primary.py'
+      - 'tests/test_primary.py'
+      - 'configs/primary_smoke.json'
+      - '.github/workflows/primary.yml'
+permissions:
+  contents: write
+concurrency:
+  group: primary-source-smoke
+  cancel-in-progress: false
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -e '.[parquet,dev]'
+      - name: Tests including the sports fixture
+        run: python -m pytest -q
+      - name: Record code version and capture one real source
+        run: |
+          mkdir -p outputs/primary_smoke
+          git rev-parse HEAD > outputs/primary_smoke/generating_commit.txt
+          python -m polymarket_context.primary --plan configs/primary_smoke.json --output outputs/primary_smoke
+      - name: Preserve snapshots and provenance including errors
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: primary-source-capture
+          path: outputs/primary_smoke/
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Publish successful capture without altering sports data
+        if: success()
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f outputs/primary_smoke
+          if ! git diff --cached --quiet; then
+            git commit -m 'Record real source snapshot without backdating or empirical delta'
+            pushed=false
+            for attempt in 1 2 3; do
+              git pull --rebase origin main
+              if git push origin HEAD:main; then pushed=true; break; fi
+              sleep 3
+            done
+            test "$pushed" = true
+          fi
+          cat outputs/primary_smoke/status.json >> "$GITHUB_STEP_SUMMARY"

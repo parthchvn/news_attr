@@ -1,0 +1,34 @@
+{
+  "protocol_version": "release-first-v1",
+  "intended_canonical_toolkit": "parthchvn/Polymarket",
+  "scope": "incremental predictive value, not causal attribution or reasoning recovery",
+  "sports_fixture_preserved": true,
+  "detector_selects_research_samples": false,
+  "implementation": {
+    "fomc_source_capture": "implemented; consult workflow results and outputs/primary_smoke/status.json for actual run status",
+    "forward_source_version_gate": "implemented; usable only after observed receipt and processing",
+    "historical_primary_source_auto_certification": "not implemented",
+    "coverage_aware_opportunities": "planned; not implemented in this change",
+    "strong_market_history_feature_service": "planned; legacy sports C is insufficient",
+    "dormant_identity_and_paired_evaluator": "specified; not implemented",
+    "release_time_transaction_actor_split_audit": "specified; not implemented",
+    "strong_baseline_fitted_and_frozen": false,
+    "controls_run_on_real_holdout": false,
+    "dependent_uncertainty_implemented": false,
+    "canonical_end_to_end_pipeline_integrated": false,
+    "continuous_news_and_market_collectors_deployed": false
+  },
+  "experiment": {
+    "final_cohort_selected": false,
+    "preregistration_frozen": false,
+    "market_ids": [],
+    "held_out_release_ids": [],
+    "train_validation_test_boundaries": null,
+    "coverage_certified_opportunities": null,
+    "empirical_delta_news": null,
+    "confidence_interval": null,
+    "claim_allowed": false
+  },
+  "next_acceptance_gate": "freeze source-to-market cohort and implement coverage-certified opportunities before fitting the strong baseline",
+  "important": "One source capture is an ingestion test. No accepted historical news is a coverage failure, not a zero-effect result."
+}

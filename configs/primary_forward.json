@@ -1,0 +1,6 @@
+{
+  "selection_basis": "source_schedule",
+  "purpose": "Collect every statement returned by the official monetary-policy feed, independently of market movements. Receipt, not claimed publication time, controls forward eligibility.",
+  "feed_url": "https://www.federalreserve.gov/feeds/press_monetary.xml",
+  "release_urls": []
+}

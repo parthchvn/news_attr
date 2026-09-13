@@ -1,137 +1,54 @@
-# XVI — Polymarket price movements, news attribution and D–C
+# XVI — release-first information and decision context
 
-A reproducible pilot for **507300** (Inter Milan to win the UEFA Champions League)
-and **2446852** (Ronaldo to cry at the World Cup), using the committed real trade
-extract from SII-WANGZJ/Polymarket_data.
+**Research priority: measure the out-of-sample predictive value of timestamp-eligible news, not generate more spike explanations.** The sports price dashboard remains an engineering fixture. It is not evidence that text improves decision prediction.
 
-## Fine-resolution update — start here
+Start with [RESEARCH.md](RESEARCH.md), [implementation status](research_status.json), and [the source policy](docs/PRIMARY_SOURCES.md).
 
-The default dashboard now shows **30-second execution-price observations and every
-individual supported alert**, not three merged dots. It checks 30-second,
-1-minute, 3-minute, 5-minute and 15-minute horizons separately. The display has
-match-window buttons, full-history navigation, raw-fill/VWAP layers and an
-unusual-only filter. Fine outputs are under `outputs/two_markets/fine/`.
+## Ownership and current status
+
+`news_attr` owns information ingestion, immutable source versions, provenance and retrospective inspection. The existing [parthchvn/Polymarket](https://github.com/parthchvn/Polymarket) toolkit is the intended home of opportunity construction, strong baselines and the new evaluator. **That evaluator is a planned integration, not an implemented or tested feature of this commit.** No second model-training stack is maintained here.
+
+| Component | Status |
+|---|---|
+| Real sports trades and fine-resolution dashboard | Existing, preserved diagnostic fixture |
+| Official FOMC statement capture and forward eligibility validator | Implemented in `polymarket_context/primary.py`; exact snapshots, receipt/processing clocks, hashes, independent source plan |
+| Source capture tests and one-cycle smoke workflow | Added; check actual Actions results rather than inferring execution from source code |
+| Continuous deployed news AND market collectors | **Not deployed by this change**; a watch command is not a running service |
+| Coverage-aware opportunities and strong fitted baseline | **Planned, not completed** |
+| Dormant-news identity, split audits and controlled evaluator | **Specified in the protocol, not implemented here** |
+| Held-out empirical news increment with dependent uncertainty | **Not measured**; zero accepted historical news is not a zero-effect result |
+
+## Primary-source ingestion
 
 ```bash
-git clone https://github.com/parthchvn/news_attr.git
-cd news_attr
-python -m venv .venv
-source .venv/bin/activate
 python -m pip install -e '.[parquet,dev]'
 python -m pytest -q
-python -m polymarket_context.fine
+
+# One real capture: old official statement, observed NOW, never backdated.
+python -m polymarket_context.primary --plan configs/primary_smoke.json --output runs/primary-smoke
+
+# Optional operator-run forward process. Keep its host and storage running.
+python -m polymarket_context.primary --plan configs/primary_forward.json --output runs/primary-forward --watch
+```
+
+Each captured version contains exact extracted statement text, a raw snapshot, two hashes, the recorded source-selection plan, request/receive/processing times and `usable_at`. Eligibility is **`usable_at < cutoff`**. Unsupported layouts and failed requests are recorded, not filled with synthetic content. A capture of a 2025 page today is eligible only after today's capture, never for 2025 trades. It remains unassigned to markets until a cohort/relevance policy is approved.
+
+The official-feed adapter is independent of prices and runs once by default. Polling does not prove complete feed coverage or uninterrupted collection. Original market-book/trade collection stays in the canonical toolkit; it is not duplicated here. No orders, keys, trading, or paid services are used by this adapter.
+
+The **Release-first source capture** workflow runs software tests and one real source capture. It does not start a persistent collector. It retains raw snapshots, status and errors as workflow artifacts; successful captures are also published under `outputs/primary_smoke/`. Consult that directory's status and generating commit for evidence of an actual run.
+
+## Research path
+
+Use scheduled primary-source releases and contracts about **later, still-unresolved policy decisions**. Keep every predetermined release window, including quiet ones. Construct fixed-grid actor-market opportunities from past-known participation and coverage; model participation and conditional action separately. Freeze a strong market/history/timing baseline, then evaluate text on the same opportunities with exact dormant-context identity, event/time/transaction/actor split audits and controls. Details and incomplete acceptance gates are in [RESEARCH.md](RESEARCH.md).
+
+## Existing sports dashboard
+
+Existing files and commands have not been removed or silently reinterpreted:
+
+```bash
 open outputs/two_markets/dashboard.html
-
-# Optional finer bins:
-python -m polymarket_context.fine --bin-seconds 15
-```
-
-For an existing clone, run `git pull` first. Downloaded HTML opens directly in a
-browser; GitHub's normal file preview does not execute the dashboard.
-
-Use **`python -m polymarket_context.rebuild`** for a complete legacy D-C/candidate
-rebuild followed by the new fine dashboard. The old `seed` command alone still
-produces the legacy overview; run `fine` afterward. Old five-minute episode and
-D-C files retain their original semantics. Their counts are not the new counts.
-
-The detector uses a share-weighted median, corroboration by multiple transactions,
-explicit missingness, boundary-aware changes and past-only robust thresholds.
-Supported size changes and statistically unusual candidates are labelled
-separately. More markers do not establish more independent news events or higher
-causal accuracy. New source searches are queued, **not executed**; strict C/news
-and final outcomes are not changed.
-
-Read [the full detection specification](docs/FINE_DETECTION.md),
-[the quickstart](QUICKSTART.md), and the actual
-[run summary](outputs/two_markets/fine/summary.json). The old overview is preserved
-as `outputs/two_markets/dashboard_legacy.html`. The **Fine-resolution price
-detection** workflow runs all tests, rebuilds on the real Parquet extract, and
-publishes the completed dashboard, diagnostics and generating commit.
-
-## What is in the repository
-
-| Location | Contents |
-|---|---|
-| `data/selected/` | Filtered real trades, market metadata, pinned source revision and extraction manifest |
-| `outputs/two_markets/dashboard.html` | Fine-grained interactive price and context review |
-| `outputs/two_markets/fine/` | Fine observations, all alerts, data-quality diagnostics, bounded news groups and planned searches |
-| `outputs/two_markets/dashboard_legacy.html` | Original five-minute/merged-episode dashboard |
-| `outputs/two_markets/dc.jsonl.gz` | Executed-action D plus strict earlier market/history C; audited news gate |
-| `outputs/two_markets/dc_candidate.jsonl.gz` | Exploratory D/C_candidate, explicitly not training-eligible |
-| `outputs/two_markets/documents.jsonl` | Existing candidate source records and timestamp uncertainty |
-| `outputs/two_markets/pilot_status.json` | Legacy D-C and news coverage, not new fine-alert counts |
-| `docs/VERIFICATION.md` | Historical news availability and text-version audit requirements |
-
-## News status
-
-The first hosted RSS run failed on all 42 requests. The inspected pilot uses
-**eight manually located source records**, five for Inter and three for Ronaldo,
-including UEFA, Reuters, Field Level Media and AP coverage. This is not complete
-automatic historical news collection. Only three have a recovered publication
-clock; a publisher timestamp alone does not establish the historical text version.
-Completed-match reports are aftermath, not pre-goal evidence.
-
-The fine dashboard only carries existing sources into overlapping, previously
-scoped windows and recomputes their timing roles. It does not invent explanations
-for new alerts. Strict `C.news` remains empty in the current seed build; the
-candidate dataset makes potential context inspectable without calling it
-leakage-audited training data. Source retrieval code remains available in
-`collect.py`, but a working historical provider is needed to automate the new
-queue. X is not integrated.
-
-After a full local rebuild, import genuinely audited documents with:
-
-```bash
-python -m polymarket_context.pilot --stage dc --verified-documents verified_documents.jsonl
+# Rebuild prices only when needed:
 python -m polymarket_context.fine
 ```
 
-Do not relabel a hindsight-selected source merely to pass the strict-context gate.
-
-## Price and action semantics
-
-Read `trades.parquet`, not maker/taker-expanded `users.parquet`. Map token1 price
-to p and token2 to 1-p; `quant.parquet` is already normalized and must not be
-inverted again. Outcome labels are checked against metadata. These are completed
-execution prices, not reconstructed best asks or bids. No buying quote can be
-inferred between trades from this extract alone.
-
-Exact chain logs are deduplicated, invalid zero-share rows rejected and known
-exchange summary addresses filtered. This does not audit every possible economic
-duplication or distinguish humans from bots.
-
-D is a taker transaction/market/token/direction bundle aggregating fills. C uses
-completed price bins strictly before execution, earlier selected-market actor
-history and eligible news. Same-timestamp histories are frozen. Own-fill prices
-and final resolution stay outside C. A fill can execute an order submitted
-earlier; these are pre-fill executed-action proxies, not observed reasoning,
-proven individual exposure or reconstructed order-submission decisions. Portfolio
-history outside these two markets is missing.
-
-## Re-extraction, tests and provenance
-
-The saved extract avoids scanning the full dataset again. Re-extract only when
-needed:
-
-```bash
-python scripts/extract_hf.py --output data/selected
-# Or use local source files:
-python scripts/extract_hf.py --source /path/to/trades.parquet --markets-source /path/to/markets.parquet
-```
-
-Remote predicate pushdown can still transfer many GB. The pinned source revision
-and hash are recorded in `data/selected/extraction_manifest.json`.
-
-Tests cover normalization, exact-log identity, gaps, strict temporal joins,
-future-change invariance, robust fine-window detection, same-time support,
-news timing gates and safe report rendering. Software tests do not prove causal
-attribution or historical news completeness. Fine detector accuracy still needs
-an independently timestamped, held-out event benchmark.
-
-Source schema: https://huggingface.co/datasets/SII-WANGZJ/Polymarket_data
-
-Order lifecycle: https://docs.polymarket.com/concepts/order-lifecycle
-
-Respect source terms. Source records contain links, headlines and short newly
-written paraphrases, not full copyrighted article bodies or source images.
-No trading, wallet signing, private keys or API secrets are involved.
+[SPORTS_PILOT.md](SPORTS_PILOT.md) preserves the previous README and its reproduction instructions. [QUICKSTART.md](QUICKSTART.md) describes the sports fixture. Fine detector development is frozen for the research milestone: it does **not** choose eligible releases, prediction opportunities or news-training rows. Legacy D-C files remain execution-only and cannot implement the new estimand without opportunity reconstruction.
