@@ -64,13 +64,32 @@ def request_bytes(url: str) -> tuple[bytes, dict]:
 
 
 class Paragraphs(HTMLParser):
+    """Extract p text, honoring optional p end tags before block elements.
+
+    The observed Fed releaseTime paragraph omits </p> before its share menu.
+    Flush at that boundary rather than discarding the header or including
+    navigation in its text. Inline elements retain their original spacing.
+    """
+    P_END = frozenset({'address', 'article', 'aside', 'blockquote', 'details',
+                      'div', 'dl', 'fieldset', 'figcaption', 'figure', 'footer',
+                      'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header',
+                      'hgroup', 'hr', 'main', 'menu', 'nav', 'ol', 'p', 'pre',
+                      'search', 'section', 'table', 'ul'})
+
     def __init__(self):
         super().__init__(convert_charrefs=True)
         self.items, self.current, self.active = [], [], False
 
+    def finish(self):
+        if self.active:
+            self.items.append(' '.join(''.join(self.current).split()))
+        self.current, self.active = [], False
+
     def handle_starttag(self, tag, attrs):
+        if tag in self.P_END:
+            self.finish()
         if tag == 'p':
-            self.current, self.active = [], True
+            self.active = True
         elif self.active and tag == 'br':
             self.current.append(' ')
 
@@ -79,14 +98,18 @@ class Paragraphs(HTMLParser):
             self.current.append(data)
 
     def handle_endtag(self, tag):
-        if tag == 'p' and self.active:
-            self.items.append(' '.join(''.join(self.current).split()))
-            self.active = False
+        if tag in self.P_END or tag in {'body', 'html'}:
+            self.finish()
+
+    def close(self):
+        super().close()
+        self.finish()
 
 
 def statement_text(raw: bytes) -> tuple[str, str]:
     parser = Paragraphs()
     parser.feed(raw.decode('utf-8-sig'))
+    parser.close()
     start = next((i for i, p in enumerate(parser.items)
                   if re.match(r'For release at ', p)), None)
     if start is None:
@@ -97,7 +120,6 @@ def statement_text(raw: bytes) -> tuple[str, str]:
             break
         if p:
             selected.append(p)
-    text = '\n\n'.join(selected)
     if not selected or not any(p.startswith('Voting for the monetary policy action') for p in selected):
         raise ValueError('Missing FOMC voting paragraph; not a supported statement')
     # Stop at the last voting paragraph; never add footer/navigation as model text.
@@ -217,7 +239,7 @@ def capture(plan: dict, output: Path, fetcher=request_bytes) -> dict:
                        'source_release_claim': header, 'historical_usable_at': None,
                        'raw_path': raw_path, 'raw_sha256': sha(raw),
                        'verified_text': text, 'text_sha256': sha(text.encode()),
-                       'extractor': 'fomc-paragraphs-v1', 'response': response,
+                       'extractor': 'fomc-paragraphs-v2', 'response': response,
                        'market_ids': [], 'clock_assumption': 'Trusted collector UTC wall clock',
                        'note': 'Available only after this capture. Not backdated to the release date.'}
                 validate_record(row, output)
