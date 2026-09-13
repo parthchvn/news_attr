@@ -1,0 +1,63 @@
+name: Construct charts and D-C pilot
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['Extract requested Polymarket markets']
+    types: [completed]
+  push:
+    paths: ['run_pilot.txt']
+permissions:
+  contents: write
+concurrency:
+  group: two-market-pilot
+  cancel-in-progress: false
+jobs:
+  pilot:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -e '.[parquet,dev]'
+      - run: python -m pytest -q
+      - name: Check extraction is present
+        id: data
+        run: |
+          if test -f data/selected/trades.parquet; then
+            echo 'ready=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+            echo 'No successful extract yet. This run has not constructed real charts or D-C.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Build prices, candidate news and strict D-C
+        if: steps.data.outputs.ready == 'true'
+        run: python -m polymarket_context.pilot --stage all --overwrite
+      - name: Retain generated results
+        if: always() && steps.data.outputs.ready == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: two-market-pilot
+          path: |
+            outputs/two_markets/*.json
+            outputs/two_markets/*.jsonl
+            outputs/two_markets/*.gz
+            outputs/two_markets/*.parquet
+            outputs/two_markets/*.html
+          retention-days: 14
+      - name: Commit completed artifacts and coverage
+        if: success() && steps.data.outputs.ready == 'true'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f outputs/two_markets/*.json outputs/two_markets/*.jsonl outputs/two_markets/*.gz outputs/two_markets/*.parquet outputs/two_markets/dashboard.html
+          if ! git diff --cached --quiet; then
+            git commit -m 'Add real-market price charts, candidate context and D-C coverage'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+          cat outputs/two_markets/pilot_status.json >> "$GITHUB_STEP_SUMMARY"

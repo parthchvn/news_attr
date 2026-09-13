@@ -1,0 +1,15 @@
+{
+  "data_path": "data/selected/trades.parquet",
+  "markets_metadata_path": "data/selected/markets.json",
+  "input_kind": "trades",
+  "output_dir": "outputs/two_markets",
+  "write_parquet": true,
+  "synthetic": false,
+  "markets": [
+    {"market_id":"507300","question":"Will Inter Milan win the UEFA Champions League?","outcome1_label":"Yes","outcome2_label":"No","search_queries":["\"Inter Milan\" \"Champions League\"","Internazionale Champions League injury lineup goal result"],"required_term_groups":[["Inter Milan","Internazionale","Inter"],["Champions League","UEFA","UCL"]]},
+    {"market_id":"2446852","question":"Will Ronaldo Cry at the World Cup?","outcome1_label":"Yes","outcome2_label":"No","search_queries":["Ronaldo \"World Cup\"","Ronaldo Portugal World Cup crying tears video"],"required_term_groups":[["Ronaldo"],["World Cup","Portugal","Mundial"]]}
+  ],
+  "detector":{"bin_minutes":5,"horizon_minutes":15,"baseline_hours":24,"min_baseline_bins":24,"jump_pp":3.0,"rv_pp":3.0,"z_threshold":4.0,"scale_floor_pp":0.5,"merge_minutes":30},
+  "news":{"provider":"google_rss","calendar_window_days":14,"lookback_hours":24,"post_hours":2,"max_episodes_per_market":10,"max_requests":80,"max_results_per_query":10,"request_delay_seconds":1.0},
+  "dc":{"news_lookback_hours":72,"max_news_items":8,"max_price_age_minutes":60}
+}

@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xvi-polymarket-context-mvp"
+version = "0.2.0"
+description = "Trade-price charts and timestamp-aware candidate-news review"
+requires-python = ">=3.11"
+dependencies = ["numpy>=1.26,<3", "pandas>=2.2,<3", "plotly>=5.24,<7", "requests>=2.31,<3"]
+
+[project.optional-dependencies]
+parquet = ["pyarrow>=16,<24", "duckdb>=1.3,<2"]
+dev = ["pytest>=8,<10"]
+
+[project.scripts]
+pm-context = "polymarket_context.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["polymarket_context*"]
