@@ -1,51 +1,88 @@
-# Working two-market run
+# Open and run the fine-resolution pilot
 
-The filtered trades are already committed: **86,687 raw Inter fills** and **32,496 raw Ronaldo fills**. One zero-share Inter row is rejected in normalization. The source revision and actual counts are in `data/selected/extraction_manifest.json`.
+## Open the completed dashboard
 
-## Open the completed result
-
-Open `outputs/two_markets/dashboard.html` locally after cloning/downloading the repository. It embeds Plotly. GitHub's normal file view does not run HTML. Inspect `outputs/two_markets/pilot_status.json` for actual news/link/D-C counts.
-
-## Reproduce without a news API
+From the repository folder on a Mac:
 
 ```bash
-git clone https://github.com/parthchvn/news_attr.git
-cd news_attr
+git pull
+open outputs/two_markets/dashboard.html
+```
+
+Or download the HTML and double-click it. It is self-contained: no server or
+news API is required. GitHub's normal file preview does not run HTML scripts.
+Check the **Fine-resolution price detection** workflow and
+`outputs/two_markets/fine/generating_commit.txt` for the completed build.
+
+## Rebuild the charts
+
+```bash
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install -e '.[parquet,dev]'
 python -m pytest -q
-python -m polymarket_context.seed
+python -m polymarket_context.fine
+open outputs/two_markets/dashboard.html
 ```
 
-This rebuilds derived outputs from the already-filtered real trades and eight inspected source records in `context/seed_documents.jsonl`. It overwrites generated outputs; keep your review/verified import files separately. No full HF download or paid API is needed. Rebuilding also establishes local absolute-path provenance before running other CLI stages.
+The filtered real trades are already committed. You do not need to download the
+full Hugging Face dataset again. Default observations are 30 seconds; optionally:
 
-## What is complete, and what is not
+```bash
+python -m polymarket_context.fine --bin-seconds 15
+```
 
-Price reconstruction and D-C market/history features have run on real data. **Automatic RSS retrieval failed on all 42 requests in the first run**. The actual result therefore uses a small, manually sourced fallback, not a claim of complete automatic news coverage. The original failures are preserved in the recovery artifact/output when available.
+Finer bins can have less evidence. The detector does not fill missing prices or
+accept poorly supported observations merely to generate more markers. Bins are
+execution summaries, not executable buying quotes.
 
-There are five Inter-related records (UEFA previews/reports and a Reuters lineup announcement) and three Ronaldo-related records (Reuters, Field Level Media and an AP eyewitness report). Sources have URLs, publisher date claims, explicit date uncertainty and manual discovery provenance. Repeated coverage shares an information-event ID; it is not independent evidence of multiple catalysts.
+## Read the dashboard
 
-Only three of these sources have an explicitly recovered publication clock. Date-only sources remain retrospective chart annotations, not pre-trade inputs. Completed-match reports remain aftermath; final scores are never backdated into C. The sources were selected around known episodes and their text versions are not independently archived, so **none is promoted to strict C.news**.
+The default line is the share-weighted median execution price. Toggle the
+share-weighted average or every recorded fill in the legend. Use the match/detail
+buttons to zoom into the relevant period, or **Full history** for the whole
+contract. Use the dropdown for all supported changes, unusual-only changes, or
+short-horizon alerts.
 
-The first detector is intentionally conservative about trade gaps. It flags ten complete-window movement episodes in this snapshot, not every economically important change. Three are Inter episodes, seven Ronaldo episodes. Not every episode receives a candidate explanation.
+Click any marker or table row. The detail panel shows the exact detection time,
+reference horizons, signed changes, variation, coverage, transaction support and
+robust scores. One time can trigger multiple horizons; subsequent times remain
+separate markers. Neither a marker nor a score establishes a separate news event.
 
-## D-C files
+The source panel contains existing manually scoped candidates only. Unverified
+sources are not promoted into C. No-source means no match is established, not
+that nothing relevant happened. New retrieval jobs are planned, not executed.
 
-`dc.jsonl.gz` contains **D** (grouped taker executions) and **C** (strict earlier completed-price bins, selected-market actor history and verified news only). This pilot has market/history C but no verified news.
+## Files
 
-`dc_candidate.jsonl.gz` contains the same D with **C_candidate**, including eligible earlier publisher-time news candidates. Every row has `training_eligible: false`: this is a review dataset, not leakage-audited training data. The point is to make the first version useful without disguising uncertainty.
+New detection outputs are in `outputs/two_markets/fine/`: `bars.csv.gz`,
+`diagnostics.csv.gz`, `alerts.jsonl`, `alerts.csv`, `news_groups.jsonl`,
+`search_jobs.jsonl`, `legacy_context_links.jsonl` and `summary.json`.
+The older five-minute chart remains in `dashboard_legacy.html`.
+The parent `bars.csv`, `episodes.jsonl` and `pilot_status.json` still describe the
+legacy version, not the fine detector. This separation preserves old provenance.
 
-`decision_news_candidates.jsonl.gz` is the normalized decision-to-candidate join. `documents.jsonl` and `attribution_links.jsonl` retain article provenance and retrospective episode associations.
+## Rebuild everything, including D-C
 
-## Context-attribution steps
+```bash
+python -m polymarket_context.rebuild
+```
 
-1. Inspect a price-movement marker and its source cards. Separate pre-window candidates, ambiguous dates and aftermath; do not assign a cause just because it sounds plausible.
-2. Open the original source. For sports, compare lineups, goals and contemporaneous video reports with the contract's precise rules. Game-clock minutes are not UTC news-publication times.
-3. Record a review label and alternatives. A source that explains the event retrospectively is still not necessarily usable before a trade.
-4. Recover a defensible earlier text version and availability time. Keep source selection independent of the target action for training. Follow `docs/VERIFICATION.md`; do not relabel spike-selected sources to pass the gate.
-5. Import genuinely audited documents with `python -m polymarket_context.pilot --stage dc --verified-documents verified_documents.jsonl` after a local rebuild. Inspect the coverage manifest rather than assuming all trades received news.
+This calls the existing real-data/manual-news seed pipeline and then the fine
+chart builder. It overwrites derived outputs; keep reviews and verified imports
+in separate files. Running the old `seed` or `pilot` commands alone can restore
+the legacy dashboard; run `fine` afterward.
 
-For new automatic collection, the configurable RSS and optional Tavily adapters remain in `collect.py`. The RSS source failed in the hosted run; a provider with working historical coverage is required to automate beyond this inspected seed. The seed runner makes no claim to have fixed that provider failure. X is not connected by this code.
+The conservative D-C export still uses its original earlier five-minute price
+features. The exploratory D/C_candidate export remains explicitly not
+training-eligible. Changing the chart does not silently change the training data.
 
-Wallet activity is not automatically human behavior; a fill may execute an earlier submitted order. Grouping is an executed-action proxy, not an identification of the trader's true reasoning or original decision time.
+For genuinely audited news, follow `docs/VERIFICATION.md`, then run:
+
+```bash
+python -m polymarket_context.pilot --stage dc --verified-documents verified_documents.jsonl
+python -m polymarket_context.fine
+```
+
+The second command does not mutate D-C. Read `docs/FINE_DETECTION.md` for all
+thresholds, formulas, missingness checks and accuracy limitations.

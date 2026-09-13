@@ -1,0 +1,64 @@
+name: Fine-resolution price detection
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'polymarket_context/fine.py'
+      - 'polymarket_context/fine_report.py'
+      - 'polymarket_context/rebuild.py'
+      - 'tests/test_fine.py'
+      - 'config.two_markets.json'
+      - '.github/workflows/fine.yml'
+  workflow_run:
+    workflows: ['Publish inspected-context pilot', 'Construct charts and D-C pilot']
+    types: [completed]
+permissions:
+  contents: write
+concurrency:
+  group: fine-price-publish
+  cancel-in-progress: false
+jobs:
+  build:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -e '.[parquet,dev]'
+      - name: Run all software tests
+        shell: bash
+        run: python -m pytest -q | tee /tmp/fine-tests.txt
+      - name: Build fine diagnostics from the committed real extract
+        run: |
+          python -m polymarket_context.fine
+          git rev-parse HEAD > outputs/two_markets/fine/generating_commit.txt
+          cp /tmp/fine-tests.txt outputs/two_markets/fine/test_results.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fine-price-results
+          path: |
+            outputs/two_markets/fine/
+            outputs/two_markets/dashboard.html
+          retention-days: 30
+      - name: Publish results without altering strict D-C
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f outputs/two_markets/fine outputs/two_markets/dashboard.html outputs/two_markets/dashboard_legacy.html
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish fine-resolution prices, individual alerts and auditable diagnostics'
+            pushed=false
+            for attempt in 1 2 3; do
+              git pull --rebase origin main
+              if git push origin HEAD:main; then pushed=true; break; fi
+              sleep 3
+            done
+            test "$pushed" = true
+          fi
+          cat outputs/two_markets/fine/summary.json >> "$GITHUB_STEP_SUMMARY"

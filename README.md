@@ -1,12 +1,16 @@
-# XVI — Polymarket news attribution and D–C
+# XVI — Polymarket price movements, news attribution and D–C
 
-A working first-version pipeline for **507300** (Inter Milan to win the UEFA Champions League) and **2446852** (Ronaldo to cry at the World Cup).
+A reproducible pilot for **507300** (Inter Milan to win the UEFA Champions League)
+and **2446852** (Ronaldo to cry at the World Cup), using the committed real trade
+extract from SII-WANGZJ/Polymarket_data.
 
-**Start with [QUICKSTART.md](QUICKSTART.md).** The selected real trades are committed. Completed outputs are published to [`outputs/two_markets`](outputs/two_markets) by the **Publish inspected-context pilot** workflow; check the run and `pilot_status.json` rather than assuming source code implies successful execution.
+## Fine-resolution update — start here
 
-## Open or reproduce
-
-Clone/download the repository and open `outputs/two_markets/dashboard.html` locally. GitHub's file viewer does not run arbitrary HTML; the downloaded file embeds its plotting library and needs no server.
+The default dashboard now shows **30-second execution-price observations and every
+individual supported alert**, not three merged dots. It checks 30-second,
+1-minute, 3-minute, 5-minute and 15-minute horizons separately. The display has
+match-window buttons, full-history navigation, raw-fill/VWAP layers and an
+unusual-only filter. Fine outputs are under `outputs/two_markets/fine/`.
 
 ```bash
 git clone https://github.com/parthchvn/news_attr.git
@@ -15,78 +19,119 @@ python -m venv .venv
 source .venv/bin/activate
 python -m pip install -e '.[parquet,dev]'
 python -m pytest -q
-python -m polymarket_context.seed
+python -m polymarket_context.fine
+open outputs/two_markets/dashboard.html
+
+# Optional finer bins:
+python -m polymarket_context.fine --bin-seconds 15
 ```
 
-This rebuilds all derived outputs from the already-filtered real trades and the inspected news seed. **No paid API or full HF download is needed.** The rebuild overwrites derived outputs; keep manual review and verified import files separately.
+For an existing clone, run `git pull` first. Downloaded HTML opens directly in a
+browser; GitHub's normal file preview does not execute the dashboard.
 
-## What this produces
+Use **`python -m polymarket_context.rebuild`** for a complete legacy D-C/candidate
+rebuild followed by the new fine dashboard. The old `seed` command alone still
+produces the legacy overview; run `fine` afterward. Old five-minute episode and
+D-C files retain their original semantics. Their counts are not the new counts.
 
-| File under `outputs/two_markets/` | Meaning |
+The detector uses a share-weighted median, corroboration by multiple transactions,
+explicit missingness, boundary-aware changes and past-only robust thresholds.
+Supported size changes and statistically unusual candidates are labelled
+separately. More markers do not establish more independent news events or higher
+causal accuracy. New source searches are queued, **not executed**; strict C/news
+and final outcomes are not changed.
+
+Read [the full detection specification](docs/FINE_DETECTION.md),
+[the quickstart](QUICKSTART.md), and the actual
+[run summary](outputs/two_markets/fine/summary.json). The old overview is preserved
+as `outputs/two_markets/dashboard_legacy.html`. The **Fine-resolution price
+detection** workflow runs all tests, rebuilds on the real Parquet extract, and
+publishes the completed dashboard, diagnostics and generating commit.
+
+## What is in the repository
+
+| Location | Contents |
 |---|---|
-| `dashboard.html` | Interactive prices, movement markers and candidate-source cards |
-| `bars.csv`, `bars.parquet` | Five-minute trade-derived prices, activity, gaps and diagnostics |
-| `episodes.jsonl` | Coarse movement windows and first detection times |
-| `documents.jsonl` | Real source headlines, short paraphrases, URLs and timestamp uncertainty |
-| `attribution_links.jsonl` | Retrospective episode-to-document associations, not causal labels |
-| `dc.jsonl.gz` | D plus strict earlier market/history C; only audited news may enter C.news |
-| `dc_candidate.jsonl.gz` | D plus C_candidate with earlier publisher-time news candidates; every row is explicitly not training-eligible |
-| `decision_news_candidates.jsonl.gz` | Normalized candidate-news join, kept separate from strict C |
-| `decisions.csv.gz` | Grouped taker executions with original token and BUY/SELL side |
-| `pilot_status.json` | Actual coverage, decision counts and strict versus candidate news counts |
-| `search_status.jsonl` | Original failed searches and explicit manual-fallback provenance |
+| `data/selected/` | Filtered real trades, market metadata, pinned source revision and extraction manifest |
+| `outputs/two_markets/dashboard.html` | Fine-grained interactive price and context review |
+| `outputs/two_markets/fine/` | Fine observations, all alerts, data-quality diagnostics, bounded news groups and planned searches |
+| `outputs/two_markets/dashboard_legacy.html` | Original five-minute/merged-episode dashboard |
+| `outputs/two_markets/dc.jsonl.gz` | Executed-action D plus strict earlier market/history C; audited news gate |
+| `outputs/two_markets/dc_candidate.jsonl.gz` | Exploratory D/C_candidate, explicitly not training-eligible |
+| `outputs/two_markets/documents.jsonl` | Existing candidate source records and timestamp uncertainty |
+| `outputs/two_markets/pilot_status.json` | Legacy D-C and news coverage, not new fine-alert counts |
+| `docs/VERIFICATION.md` | Historical news availability and text-version audit requirements |
 
-## Important status of the news layer
+## News status
 
-**The first hosted RSS run failed on all 42 requests.** To make the first version inspectable, this run uses **eight manually located and inspected source records**: five for Inter and three for Ronaldo. These are UEFA, Reuters, Field Level Media and AP reports, including syndicated publisher copies. This is not complete automatic historical news collection.
+The first hosted RSS run failed on all 42 requests. The inspected pilot uses
+**eight manually located source records**, five for Inter and three for Ronaldo,
+including UEFA, Reuters, Field Level Media and AP coverage. This is not complete
+automatic historical news collection. Only three have a recovered publication
+clock; a publisher timestamp alone does not establish the historical text version.
+Completed-match reports are aftermath, not pre-goal evidence.
 
-Only three records have a recovered publication clock; date-only sources remain chart annotations. Exact publisher timestamps still do not certify the historical text version. Completed-match reports are aftermath, not pre-goal evidence. All seed documents were selected around known episodes, and **none is silently promoted to strict C.news**. The strict dataset still contains earlier market-state and actor-history context. The candidate dataset makes unverified news inspectable without calling it leakage-audited training data.
+The fine dashboard only carries existing sources into overlapping, previously
+scoped windows and recomputes their timing roles. It does not invent explanations
+for new alerts. Strict `C.news` remains empty in the current seed build; the
+candidate dataset makes potential context inspectable without calling it
+leakage-audited training data. Source retrieval code remains available in
+`collect.py`, but a working historical provider is needed to automate the new
+queue. X is not integrated.
 
-Use the seed runner to reproduce these manually scoped links. The older generic `render` command does not apply the seed-specific date-only/episode restrictions. Follow [QUICKSTART.md](QUICKSTART.md) for reviewing and expanding the corpus.
-
-## Price and action semantics
-
-Read `trades.parquet`, not maker/taker-expanded `users.parquet`. Map token1 price to p and token2 to 1-p; `quant.parquet` is already normalized and must not be inverted again. Outcome labels are checked against metadata.
-
-Five-minute price is `sum(outcome1_price * shares) / sum(shares)`. Empty bins remain missing. Original cash notional is retained separately. Exact chain logs are deduplicated, invalid zero-share rows rejected, and known exchange summary addresses filtered. These checks do not claim to audit every possible economic duplication or distinguish humans from bots.
-
-Initial movement gates are a 3-percentage-point net repricing or rolling variation, plus robust past-only z >= 4. The baseline is up to 24 hours, with a minimum warm-up and scale floor. Complete observed windows are required. This detects ten episodes in the selected snapshot (three Inter, seven Ronaldo), not every important move across sparse-trading gaps. Thresholds are engineering heuristics, not p-values.
-
-D is a **taker transaction/market/token/direction bundle**, aggregating multiple fills. C uses completed price bins strictly before the execution timestamp, earlier selected-market actor history and eligible news. Same-timestamp histories are frozen until all contexts in the batch are constructed. Own-fill prices and final resolution stay out of C. The transaction hash is a grouping key for dataset splits.
-
-A fill can execute an order submitted earlier. These are executed-action proxies with pre-fill public context, not observed reasoning, proven individual exposure, or reconstructed order-submission decisions. Portfolio history outside these two markets is missing.
-
-## Extraction and extension
-
-The exact filtered source is in `data/selected/`, with a pinned revision, actual counts and SHA256 in `extraction_manifest.json`. Re-extract only when needed:
-
-```bash
-python scripts/extract_hf.py --output data/selected
-# Or use already downloaded source files:
-python scripts/extract_hf.py --source /path/to/trades.parquet \
-  --markets-source /path/to/markets.parquet --output data/selected
-```
-
-Remote Parquet projection/predicate pushdown avoids loading the whole source in pandas but can still scan many GB. The saved two-market extract avoids repeating that cost.
-
-The configurable automatic collection code (`collect.py`) includes calendar-first discovery, spike enrichment, request budgets, caching, and optional Tavily support via `TAVILY_API_KEY`. A provider with working historical coverage is required to automate beyond the seed. The seed runner does not pretend the RSS provider failure was fixed. X is not integrated.
-
-After a local rebuild, import genuinely audited sources using:
+After a full local rebuild, import genuinely audited documents with:
 
 ```bash
 python -m polymarket_context.pilot --stage dc --verified-documents verified_documents.jsonl
+python -m polymarket_context.fine
 ```
 
-See [the verification protocol](docs/VERIFICATION.md). Audit exact text, availability time and discovery provenance separately from retrospective relevance. Do not relabel a hindsight-selected source merely to pass the strict-context gate.
+Do not relabel a hindsight-selected source merely to pass the strict-context gate.
 
-## Tests and provenance
+## Price and action semantics
 
-Tests cover token normalization, exact-log deduplication, gaps, historical-only baselines, future-change invariance, original token/direction preservation, same-time history exclusion, target-price exclusion, RSS handling, timestamp/text gates, date-only seed scoping, Parquet roundtrip and a labeled synthetic smoke test. GitHub Actions runs the committed tests with Parquet dependencies installed. Software tests do not prove news completeness or causal attribution.
+Read `trades.parquet`, not maker/taker-expanded `users.parquet`. Map token1 price
+to p and token2 to 1-p; `quant.parquet` is already normalized and must not be
+inverted again. Outcome labels are checked against metadata. These are completed
+execution prices, not reconstructed best asks or bids. No buying quote can be
+inferred between trades from this extract alone.
+
+Exact chain logs are deduplicated, invalid zero-share rows rejected and known
+exchange summary addresses filtered. This does not audit every possible economic
+duplication or distinguish humans from bots.
+
+D is a taker transaction/market/token/direction bundle aggregating fills. C uses
+completed price bins strictly before execution, earlier selected-market actor
+history and eligible news. Same-timestamp histories are frozen. Own-fill prices
+and final resolution stay outside C. A fill can execute an order submitted
+earlier; these are pre-fill executed-action proxies, not observed reasoning,
+proven individual exposure or reconstructed order-submission decisions. Portfolio
+history outside these two markets is missing.
+
+## Re-extraction, tests and provenance
+
+The saved extract avoids scanning the full dataset again. Re-extract only when
+needed:
+
+```bash
+python scripts/extract_hf.py --output data/selected
+# Or use local source files:
+python scripts/extract_hf.py --source /path/to/trades.parquet --markets-source /path/to/markets.parquet
+```
+
+Remote predicate pushdown can still transfer many GB. The pinned source revision
+and hash are recorded in `data/selected/extraction_manifest.json`.
+
+Tests cover normalization, exact-log identity, gaps, strict temporal joins,
+future-change invariance, robust fine-window detection, same-time support,
+news timing gates and safe report rendering. Software tests do not prove causal
+attribution or historical news completeness. Fine detector accuracy still needs
+an independently timestamped, held-out event benchmark.
 
 Source schema: https://huggingface.co/datasets/SII-WANGZJ/Polymarket_data
 
-Pinned snapshot: https://huggingface.co/datasets/SII-WANGZJ/Polymarket_data/tree/6d3c336c39cf1a2dfe53d702ad2c110ab5bdbfde
-
 Order lifecycle: https://docs.polymarket.com/concepts/order-lifecycle
 
-Respect dataset and publisher terms. Only source links, headlines and short newly written paraphrases are stored; no source images or full copyrighted article bodies are included. No trading, wallet signing, private keys or API secrets are involved.
+Respect source terms. Source records contain links, headlines and short newly
+written paraphrases, not full copyrighted article bodies or source images.
+No trading, wallet signing, private keys or API secrets are involved.
