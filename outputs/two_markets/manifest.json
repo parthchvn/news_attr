@@ -1,0 +1,124 @@
+{
+  "prototype_version": "0.2.0",
+  "synthetic": false,
+  "config": {
+    "data_path": "/home/runner/work/news_attr/news_attr/data/selected/trades.parquet",
+    "markets_metadata_path": "data/selected/markets.json",
+    "input_kind": "trades",
+    "output_dir": "/home/runner/work/news_attr/news_attr/outputs/two_markets",
+    "write_parquet": true,
+    "synthetic": false,
+    "markets": [
+      {
+        "market_id": "507300",
+        "question": "Will Inter Milan win the UEFA Champions League?",
+        "outcome1_label": "Yes",
+        "outcome2_label": "No",
+        "search_queries": [
+          "\"Inter Milan\" \"Champions League\"",
+          "Internazionale Champions League injury lineup goal result"
+        ],
+        "required_term_groups": [
+          [
+            "Inter Milan",
+            "Internazionale",
+            "Inter"
+          ],
+          [
+            "Champions League",
+            "UEFA",
+            "UCL"
+          ]
+        ]
+      },
+      {
+        "market_id": "2446852",
+        "question": "Will Ronaldo Cry at the World Cup?",
+        "outcome1_label": "Yes",
+        "outcome2_label": "No",
+        "search_queries": [
+          "Ronaldo \"World Cup\"",
+          "Ronaldo Portugal World Cup crying tears video"
+        ],
+        "required_term_groups": [
+          [
+            "Ronaldo"
+          ],
+          [
+            "World Cup",
+            "Portugal",
+            "Mundial"
+          ]
+        ]
+      }
+    ],
+    "detector": {
+      "bin_minutes": 5,
+      "horizon_minutes": 15,
+      "baseline_hours": 24,
+      "min_baseline_bins": 24,
+      "jump_pp": 3.0,
+      "rv_pp": 3.0,
+      "z_threshold": 4.0,
+      "scale_floor_pp": 0.5,
+      "merge_minutes": 30
+    },
+    "news": {
+      "provider": "google_rss",
+      "calendar_window_days": 14,
+      "lookback_hours": 24,
+      "post_hours": 2,
+      "max_episodes_per_market": 10,
+      "max_requests": 80,
+      "max_results_per_query": 10,
+      "request_delay_seconds": 1.0
+    },
+    "dc": {
+      "news_lookback_hours": 72,
+      "max_news_items": 8,
+      "max_price_age_minutes": 60
+    }
+  },
+  "config_sha256": "00b50df35b77fb5d3d6effa1c4d442a13d1093b33c5ea4d59421bc7692d15e93",
+  "audit": {
+    "input_rows": 119183,
+    "input_kind": "trades",
+    "warnings": [
+      "Notional and count are recorded-fill aggregates, not audited economic turnover."
+    ],
+    "invalid_rows_removed": 1,
+    "duplicate_logs_removed": 0,
+    "valid_rows": 119182,
+    "exchange_summary_rows_removed": 0,
+    "filter_rule": "maker/taker matches known v1/v2 exchange, observed contract value or zero address",
+    "human_bot_classification": "not_available"
+  },
+  "normalized_projection_sha256": "d22adbfc679371f0b86c4ee728a7fe1022151533e554e8f7d30e0b5a9d7aeef0",
+  "episode_count": 10,
+  "bar_count": 83584,
+  "coverage": {
+    "507300": {
+      "first_bin": "2024-09-17 21:30:00+00:00",
+      "last_bin": "2025-05-31 23:55:00+00:00",
+      "baseline_ready_bins": 2170
+    },
+    "2446852": {
+      "first_bin": "2026-06-05 22:05:00+00:00",
+      "last_bin": "2026-07-10 00:50:00+00:00",
+      "baseline_ready_bins": 587
+    }
+  },
+  "versions": {
+    "pandas": "2.3.3",
+    "numpy": "2.4.6",
+    "plotly": "6.9.0",
+    "requests": "2.34.2"
+  },
+  "limitations": [
+    "No historical order book, order-submission reconstruction, or human/bot identification.",
+    "Same-transaction economic duplication is not independently audited.",
+    "No final resolution used. Outcome labels are supplied explicitly and validated by pilot.",
+    "Analyze alone produces retrospective episodes, not pre-decision D-C. Pilot adds calendar discovery and strict D-C.",
+    "Lexical/time candidate ranking only; no causal inference or automated timestamp verification."
+  ]
+}

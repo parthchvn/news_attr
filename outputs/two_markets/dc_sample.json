@@ -1,0 +1,207 @@
+[
+  {
+    "decision_id": "e398ad203aec2bdd312d3096",
+    "split_group": "d67371651624ba0b42cdf11dcfecf4e30a993544276a69b71e2bc129dceaea3c",
+    "D": {
+      "actor": "0x571080e37b2d37f65830e8795e38e3ca9a28ce1d",
+      "actor_role": "taker",
+      "execution_timestamp": "2024-09-17T21:28:22+00:00",
+      "transaction_hash": "d67371651624ba0b42cdf11dcfecf4e30a993544276a69b71e2bc129dceaea3c",
+      "market_id": "507300",
+      "token_side": "token1",
+      "direction": "SELL",
+      "direction_outcome1_equivalent": "SELL",
+      "shares": 20.0,
+      "recorded_notional_usd": 0.8,
+      "execution_price": 0.04,
+      "fill_count": 1
+    },
+    "C": {
+      "cutoff_exclusive": "2024-09-17T21:28:22+00:00",
+      "market_id": "507300",
+      "question": "Will Inter Milan win the UEFA Champions League?",
+      "outcome1_label": "Yes",
+      "market_state": {
+        "last_observed_bar_end": null,
+        "price_age_seconds": null,
+        "stale_or_missing": true,
+        "price_outcome1": null,
+        "displacement_pp": null,
+        "rv_pp": null,
+        "prior_bar_record_count": null
+      },
+      "actor_history_in_selected_markets": {
+        "observed_prior_bundles": 0,
+        "recorded_prior_notional_usd": 0.0
+      },
+      "news": [],
+      "news_status": "no_verified_context",
+      "metadata_note": "Configured contract identity; historical rule versions not reconstructed.",
+      "context_semantics": "pre-fill; submission time and individual exposure unobserved"
+    }
+  },
+  {
+    "decision_id": "ed6ba2fad2f510f16e0d32fa",
+    "split_group": "6fcef7754d49ac3e0317ae1b9f3f86b1efa78358df81287978e435c35e830c2b",
+    "D": {
+      "actor": "0x571080e37b2d37f65830e8795e38e3ca9a28ce1d",
+      "actor_role": "taker",
+      "execution_timestamp": "2024-09-17T21:28:26+00:00",
+      "transaction_hash": "6fcef7754d49ac3e0317ae1b9f3f86b1efa78358df81287978e435c35e830c2b",
+      "market_id": "507300",
+      "token_side": "token1",
+      "direction": "SELL",
+      "direction_outcome1_equivalent": "SELL",
+      "shares": 20.0,
+      "recorded_notional_usd": 0.8,
+      "execution_price": 0.04,
+      "fill_count": 1
+    },
+    "C": {
+      "cutoff_exclusive": "2024-09-17T21:28:26+00:00",
+      "market_id": "507300",
+      "question": "Will Inter Milan win the UEFA Champions League?",
+      "outcome1_label": "Yes",
+      "market_state": {
+        "last_observed_bar_end": null,
+        "price_age_seconds": null,
+        "stale_or_missing": true,
+        "price_outcome1": null,
+        "displacement_pp": null,
+        "rv_pp": null,
+        "prior_bar_record_count": null
+      },
+      "actor_history_in_selected_markets": {
+        "observed_prior_bundles": 1,
+        "recorded_prior_notional_usd": 0.8
+      },
+      "news": [],
+      "news_status": "no_verified_context",
+      "metadata_note": "Configured contract identity; historical rule versions not reconstructed.",
+      "context_semantics": "pre-fill; submission time and individual exposure unobserved"
+    }
+  },
+  {
+    "decision_id": "abf73301de2d85cf0cf7ee9c",
+    "split_group": "20dc8fab80469c2f1a163f487751adcfae3329893d5d478f5ef2af9ba824315d",
+    "D": {
+      "actor": "0x571080e37b2d37f65830e8795e38e3ca9a28ce1d",
+      "actor_role": "taker",
+      "execution_timestamp": "2024-09-17T21:30:46+00:00",
+      "transaction_hash": "20dc8fab80469c2f1a163f487751adcfae3329893d5d478f5ef2af9ba824315d",
+      "market_id": "507300",
+      "token_side": "token1",
+      "direction": "SELL",
+      "direction_outcome1_equivalent": "SELL",
+      "shares": 10.0,
+      "recorded_notional_usd": 0.4,
+      "execution_price": 0.04,
+      "fill_count": 1
+    },
+    "C": {
+      "cutoff_exclusive": "2024-09-17T21:30:46+00:00",
+      "market_id": "507300",
+      "question": "Will Inter Milan win the UEFA Champions League?",
+      "outcome1_label": "Yes",
+      "market_state": {
+        "last_observed_bar_end": "2024-09-17T21:30:00+00:00",
+        "price_age_seconds": 46.0,
+        "stale_or_missing": false,
+        "price_outcome1": 0.04,
+        "displacement_pp": null,
+        "rv_pp": null,
+        "prior_bar_record_count": 2
+      },
+      "actor_history_in_selected_markets": {
+        "observed_prior_bundles": 2,
+        "recorded_prior_notional_usd": 1.6
+      },
+      "news": [],
+      "news_status": "no_verified_context",
+      "metadata_note": "Configured contract identity; historical rule versions not reconstructed.",
+      "context_semantics": "pre-fill; submission time and individual exposure unobserved"
+    }
+  },
+  {
+    "decision_id": "8e414596c36a2fd33d791824",
+    "split_group": "3086aa08a367d664d85c2651b3efe1a7a1bc4064cf1e65c4b20b7fa91d886531",
+    "D": {
+      "actor": "0x571080e37b2d37f65830e8795e38e3ca9a28ce1d",
+      "actor_role": "taker",
+      "execution_timestamp": "2024-09-17T21:31:50+00:00",
+      "transaction_hash": "3086aa08a367d664d85c2651b3efe1a7a1bc4064cf1e65c4b20b7fa91d886531",
+      "market_id": "507300",
+      "token_side": "token1",
+      "direction": "SELL",
+      "direction_outcome1_equivalent": "SELL",
+      "shares": 40.0,
+      "recorded_notional_usd": 1.2,
+      "execution_price": 0.03,
+      "fill_count": 1
+    },
+    "C": {
+      "cutoff_exclusive": "2024-09-17T21:31:50+00:00",
+      "market_id": "507300",
+      "question": "Will Inter Milan win the UEFA Champions League?",
+      "outcome1_label": "Yes",
+      "market_state": {
+        "last_observed_bar_end": "2024-09-17T21:30:00+00:00",
+        "price_age_seconds": 110.0,
+        "stale_or_missing": false,
+        "price_outcome1": 0.04,
+        "displacement_pp": null,
+        "rv_pp": null,
+        "prior_bar_record_count": 2
+      },
+      "actor_history_in_selected_markets": {
+        "observed_prior_bundles": 3,
+        "recorded_prior_notional_usd": 2.0
+      },
+      "news": [],
+      "news_status": "no_verified_context",
+      "metadata_note": "Configured contract identity; historical rule versions not reconstructed.",
+      "context_semantics": "pre-fill; submission time and individual exposure unobserved"
+    }
+  },
+  {
+    "decision_id": "82670ec9e59cbc74151a555c",
+    "split_group": "3e53feb807e24d53eeca8bece6aa52218b0df38769d4232005176498b841ea5c",
+    "D": {
+      "actor": "0x571080e37b2d37f65830e8795e38e3ca9a28ce1d",
+      "actor_role": "taker",
+      "execution_timestamp": "2024-09-17T21:36:58+00:00",
+      "transaction_hash": "3e53feb807e24d53eeca8bece6aa52218b0df38769d4232005176498b841ea5c",
+      "market_id": "507300",
+      "token_side": "token1",
+      "direction": "SELL",
+      "direction_outcome1_equivalent": "SELL",
+      "shares": 30.0,
+      "recorded_notional_usd": 0.9,
+      "execution_price": 0.029999999999999995,
+      "fill_count": 1
+    },
+    "C": {
+      "cutoff_exclusive": "2024-09-17T21:36:58+00:00",
+      "market_id": "507300",
+      "question": "Will Inter Milan win the UEFA Champions League?",
+      "outcome1_label": "Yes",
+      "market_state": {
+        "last_observed_bar_end": "2024-09-17T21:35:00+00:00",
+        "price_age_seconds": 118.0,
+        "stale_or_missing": false,
+        "price_outcome1": 0.032,
+        "displacement_pp": null,
+        "rv_pp": null,
+        "prior_bar_record_count": 2
+      },
+      "actor_history_in_selected_markets": {
+        "observed_prior_bundles": 4,
+        "recorded_prior_notional_usd": 3.2
+      },
+      "news": [],
+      "news_status": "no_verified_context",
+      "metadata_note": "Configured contract identity; historical rule versions not reconstructed.",
+      "context_semantics": "pre-fill; submission time and individual exposure unobserved"
+    }
+  }
+]

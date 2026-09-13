@@ -1,0 +1,14 @@
+{
+  "decision_rows": 98627,
+  "unit": "taker_transaction_market_token_direction_bundle",
+  "strict_rows_with_news": 0,
+  "rows_with_research_candidates": 12613,
+  "news_documents": 8,
+  "markets": {
+    "507300": 73729,
+    "2446852": 24898
+  },
+  "synthetic": false,
+  "strict_news_requires": "verified text/time AND calendar or independent_manual discovery",
+  "limitation": "Pre-fill public context, not proven pre-submission context or individual exposure. No human/bot filter."
+}

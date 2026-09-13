@@ -1,0 +1,51 @@
+{
+  "mode": "real_trades_manual_candidate_news_fallback",
+  "source_revision": "6d3c336c39cf1a2dfe53d702ad2c110ab5bdbfde",
+  "documents": 8,
+  "candidate_links": 21,
+  "dc": {
+    "decision_rows": 98627,
+    "unit": "taker_transaction_market_token_direction_bundle",
+    "strict_rows_with_news": 0,
+    "rows_with_research_candidates": 12613,
+    "news_documents": 8,
+    "markets": {
+      "507300": 73729,
+      "2446852": 24898
+    },
+    "synthetic": false,
+    "strict_news_requires": "verified text/time AND calendar or independent_manual discovery",
+    "limitation": "Pre-fill public context, not proven pre-submission context or individual exposure. No human/bot filter."
+  },
+  "candidate_dataset": {
+    "rows": 98627,
+    "rows_with_candidate_news": 12613,
+    "by_market": {
+      "507300": 1215,
+      "2446852": 11398
+    }
+  },
+  "coverage": {
+    "507300": {
+      "valid_fills": 86686,
+      "episodes": 3,
+      "documents": 5,
+      "candidate_links": 8,
+      "episodes_with_candidates": 3
+    },
+    "2446852": {
+      "valid_fills": 32496,
+      "episodes": 7,
+      "documents": 3,
+      "candidate_links": 13,
+      "episodes_with_candidates": 5
+    }
+  },
+  "rss_original_failed_requests": 42,
+  "strict_news_version_audit_completed": false,
+  "unattributed_episodes": [
+    "12b7e6b0fb3d5251",
+    "78c0812ded0ab6fd"
+  ],
+  "candidate_corpus_sha256": "6fc2adb440b73aacaf2d460c4cc883afa573bad6d595a739d86d0497b513be20"
+}
