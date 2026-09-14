@@ -1,10 +1,7 @@
-"""Regressions for optional paragraph ends in the captured Fed HTML layout.
-
-The text in this minimal fixture is synthetic, not a historical release.
-"""
+"""Regressions for optional paragraph ends. Fixtures are synthetic."""
 import json
 import pytest
-from polymarket_context.primary import Paragraphs, capture, statement_text, validate_record
+from polymarket_context.primary import EXTRACTOR, Paragraphs, capture, statement_text, validate_record
 
 HEADER = 'For release at 2:00 p.m. EDT'
 VOTE = 'Voting for the monetary policy action were A and B.'
@@ -49,5 +46,5 @@ def test_optional_end_layout_capture_roundtrip(tmp_path):
     assert result['errors'] == [] and result['records_added'] == 1
     record = json.loads((tmp_path/'information.jsonl').read_text())
     validate_record(record, tmp_path)
-    assert record['extractor'] == 'fomc-paragraphs-v2'
+    assert record['extractor'] == EXTRACTOR
     assert record['historical_usable_at'] is None
