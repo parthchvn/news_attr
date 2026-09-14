@@ -1,0 +1,55 @@
+{
+  "cycles_recorded": 2,
+  "cycles_with_errors": 0,
+  "first_cycle_started_at": "2026-09-14T01:02:15.035335+00:00",
+  "last_cycle_completed_at": "2026-09-14T01:02:16.510387+00:00",
+  "latest_cycle_status": "complete",
+  "latest_cycle_errors": [],
+  "document_version_records": 4,
+  "unique_content_versions": 4,
+  "redundant_valid_records": 0,
+  "distinct_information_events": 4,
+  "validation_status": "passed",
+  "invalid_records": [],
+  "unique_view_refreshed": true,
+  "errors_by_source": [],
+  "events": [
+    {
+      "event_id": "fomc-20260318",
+      "saved_records": 1,
+      "distinct_extracted_texts": 1,
+      "first_usable_at": "2026-09-14T01:02:15.364848+00:00",
+      "source_urls": [
+        "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260318a.htm"
+      ]
+    },
+    {
+      "event_id": "fomc-20260429",
+      "saved_records": 1,
+      "distinct_extracted_texts": 1,
+      "first_usable_at": "2026-09-14T01:02:15.540128+00:00",
+      "source_urls": [
+        "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260429a.htm"
+      ]
+    },
+    {
+      "event_id": "fomc-20260617",
+      "saved_records": 1,
+      "distinct_extracted_texts": 1,
+      "first_usable_at": "2026-09-14T01:02:15.711345+00:00",
+      "source_urls": [
+        "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260617a.htm"
+      ]
+    },
+    {
+      "event_id": "fomc-20260729",
+      "saved_records": 1,
+      "distinct_extracted_texts": 1,
+      "first_usable_at": "2026-09-14T01:02:15.958854+00:00",
+      "source_urls": [
+        "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260729a.htm"
+      ]
+    }
+  ],
+  "note": "Original records/raw snapshots/timestamps are unchanged. Old cycle errors remain. Unique records retain earliest accepted availability. Validation is not complete news coverage, market relevance, or a D-C dataset."
+}
